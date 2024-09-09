@@ -1,0 +1,1 @@
+gcc -g -Wall -o hw01 hw01.c && ./hw01
