@@ -2,6 +2,7 @@
 #include <string.h>
 #include "nr.h"
 #include "solve.h"
+#include "gravity.h"
 
 void solve_f(
     F f,
@@ -133,5 +134,21 @@ int main()
     solve(&args[i]);
     print_result(&args[i]);
   }
+
+  Args gravityArgs = {
+      .func_name = "Earth-Moon Net Gravity",
+      .solver_name = "Newton-Raphson with bracketing",
+      .f = earth_moon_net_gravity,
+      .x2fdf = earth_moon_net_gravity_fdf,
+      .x1 = 330000.0,
+      .x2 = 350000.0,
+      .solver_df = rtsafe,
+      .solver_type = SOLVER_TYPE_DF,
+      .num_brackets = &num_brackets,
+      .roots = roots,
+      .max_brackets = 10000,
+  };
+  solve(&gravityArgs);
+  print_result(&gravityArgs);
   return 0;
 }

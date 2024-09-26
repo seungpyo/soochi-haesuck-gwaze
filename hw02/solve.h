@@ -24,4 +24,5 @@ float muller_solver(
     float x1,
     float x2,
     float xacc);
+
 #endif /* _SOLVE_H */
