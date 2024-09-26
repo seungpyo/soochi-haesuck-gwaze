@@ -140,14 +140,16 @@ int main()
       .solver_name = "Newton-Raphson with bracketing",
       .f = earth_moon_net_gravity,
       .x2fdf = earth_moon_net_gravity_fdf,
-      .x1 = 330000.0,
-      .x2 = 350000.0,
+      .x1 = earth_moon_distance_in_km * 0.01,
+      .x2 = earth_moon_distance_in_km * 0.99,
       .solver_df = rtsafe,
       .solver_type = SOLVER_TYPE_DF,
       .num_brackets = &num_brackets,
       .roots = roots,
-      .max_brackets = 10000,
+      .max_brackets = 256,
+      .xacc_mul = 1e-6,
   };
+
   solve(&gravityArgs);
   print_result(&gravityArgs);
   return 0;
