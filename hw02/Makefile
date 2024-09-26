@@ -1,6 +1,7 @@
 CC = cc
 CFLAGS = -g -I ../NRs/ansi/other
 SRCS = main.c \
+	muller.c \
 	../NRS/ansi/recipes/zbrak.c \
 	../NRS/ansi/recipes/rtbis.c \
 	../NRS/ansi/recipes/rtflsp.c \

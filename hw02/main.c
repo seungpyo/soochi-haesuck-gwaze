@@ -1,15 +1,7 @@
 #include <stdio.h>
+#include <string.h>
 #include "nr.h"
-
-#define SOLVER_TYPE_F 0
-#define SOLVER_TYPE_DF 1
-#define MAX_BRACKETS 100
-#define MAX_NAME_LEN 128
-
-typedef float (*F)(float);
-typedef void (*X2FDF)(float, float *, float *);
-typedef float (*SolverF)(float (*)(float), float, float, float);
-typedef float (*SolverDF)(void (*)(float, float *, float *), float, float, float);
+#include "solve.h"
 
 void solve_f(
     F f,
@@ -93,62 +85,51 @@ int main()
   float roots[MAX_BRACKETS];
   Args args[] = {
       {
-          .f = bessj0,
-          .x2fdf = x2fdf_bessj0,
-          .x1 = 1.0,
-          .x2 = 10.0,
           .solver_f = rtbis,
           .solver_type = SOLVER_TYPE_F,
-          .func_name = "bessj0",
           .solver_name = "Bisection",
       },
       {
-          .f = bessj0,
-          .x2fdf = x2fdf_bessj0,
-          .x1 = 1.0,
-          .x2 = 10.0,
           .solver_f = rtflsp,
           .solver_type = SOLVER_TYPE_F,
-          .func_name = "bessj0",
           .solver_name = "Linear interpolation",
       },
       {
-          .f = bessj0,
-          .x2fdf = x2fdf_bessj0,
-          .x1 = 1.0,
-          .x2 = 10.0,
           .solver_f = rtsec,
           .solver_type = SOLVER_TYPE_F,
-          .func_name = "bessj0",
           .solver_name = "Secant",
       },
       {
-          .f = bessj0,
-          .x2fdf = x2fdf_bessj0,
-          .x1 = 1.0,
-          .x2 = 10.0,
           .solver_df = rtnewt,
           .solver_type = SOLVER_TYPE_DF,
-          .func_name = "bessj0",
           .solver_name = "Newton-Raphson",
       },
       {
-          .f = bessj0,
-          .x2fdf = x2fdf_bessj0,
-          .x1 = 1.0,
-          .x2 = 10.0,
           .solver_df = rtsafe,
           .solver_type = SOLVER_TYPE_DF,
-          .func_name = "bessj0",
           .solver_name = "Newton-Raphson with bracketing",
       },
+      {
+          .solver_f = muller_solver,
+          .solver_type = SOLVER_TYPE_F,
+          .solver_name = "Muller",
+      },
   };
-  for (int i = 0; i < sizeof(args) / sizeof(Args); ++i)
+  const int num_args = sizeof(args) / sizeof(Args);
+  for (int i = 0; i < num_args; ++i)
   {
+    strncpy(args[i].func_name, "Bessel J0", MAX_NAME_LEN);
     args[i].num_brackets = &num_brackets;
     args[i].roots = roots;
     args[i].max_brackets = MAX_BRACKETS;
     args[i].xacc_mul = 1e-6;
+  }
+  for (int i = 0; i < num_args; ++i)
+  {
+    args[i].f = bessj0;
+    args[i].x2fdf = x2fdf_bessj0;
+    args[i].x1 = 1.0;
+    args[i].x2 = 10.0;
     solve(&args[i]);
     print_result(&args[i]);
   }
