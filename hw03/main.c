@@ -39,7 +39,7 @@ int main()
     }
     for (int i = 1; i <= n; ++i)
     {
-      fscanf(fp, "%f", &b[i]);
+      fscanf(fp, "%f", &b[i][1]);
     }
     fclose(fp);
 
