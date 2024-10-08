@@ -30,6 +30,17 @@ void flatten(float **mat, float *vec, int lo, int hi) {
     }
 }
 
+void report(const char *method, float *sol, int n) {
+    printf("Method: %s, Solution: [", method);
+    for (int i = 1; i <= n; ++i) {
+        if (i > 1) {
+            printf(", ");
+        }
+        printf("%f", sol[i]);
+    }
+    printf("]\n");
+}
+
 int main() {
     char fname[32];
     for (int file_idx = 1; file_idx <= 3; ++file_idx) {
@@ -46,6 +57,11 @@ int main() {
         float **b_mat = matrix(1, m, 1, 1);
         float *b = vector(1, m);
         float **c = matrix(1, n, 1, 1);
+        float d;
+        float *w = vector(1, n);
+        float **v = matrix(1, n, 1, n);
+        float *x = vector(1, n);
+        int *ivec = ivector(1, n);
         float **a_bkup = matrix(1, m, 1, n);
         float **b_bkup = matrix(1, m, 1, 1);
 
@@ -62,40 +78,28 @@ int main() {
         copy_matrix(a, a_bkup, 1, m, 1, n);
         copy_matrix(b_mat, b_bkup, 1, m, 1, 1);
 
+        ////////// Gauss-Jordan
         gaussj(a, n, b_mat, 1);
         printf("Method: Gauss-Jordan, Solution: [");
-        for (int i = 1; i <= n; ++i) {
-            if (i > 1) {
-                printf(", ");
-            }
-            printf("%f", b_mat[i][1]);
-        }
+        float **gauss_x = vector(1, n);
+        flatten(b_mat, gauss_x, 1, n);
+        report("Gauss-Jordan", gauss_x, n);
+        free_vector(gauss_x, 1, n);
+
+        copy_matrix(a_bkup, a, 1, m, 1, n);
+        copy_matrix(b_bkup, b_mat, 1, m, 1, 1);
+
+        flatten(b_mat, b, 1, m);
+        ludcmp(a, m, ivec, &d);
+        lubksb(a, m, ivec, b);
+        report("LU Decomposition", b, n);
         printf("]\n");
 
         copy_matrix(a_bkup, a, 1, m, 1, n);
         copy_matrix(b_bkup, b_mat, 1, m, 1, 1);
 
-        int *indices = ivector(1, n);
+        /////////////////// SVD
         flatten(b_mat, b, 1, m);
-        ludcmp(a, m, indices, c);
-        lubksb(a, m, indices, b);
-        printf("Method: LU Decomposition, Solution: [");
-        for (int i = 1; i <= n; ++i) {
-            if (i > 1) {
-                printf(", ");
-            }
-            printf("%f", b[i]);
-        }
-        printf("]\n");
-
-        copy_matrix(a_bkup, a, 1, m, 1, n);
-        copy_matrix(b_bkup, b_mat, 1, m, 1, 1);
-        flatten(b_mat, b, 1, m);
-
-        // SVD
-        float *w = vector(1, n);
-        float **v = matrix(1, n, 1, n);
-        float *x = vector(1, n);
         svdcmp(a, m, n, w, v);
         float maxSingular = 0;
         for (int i = 1; i <= n; ++i) {
@@ -109,17 +113,57 @@ int main() {
             }
         }
         svbksb(a, w, v, m, n, b, x);
+        report("SVD", x, n);
 
-        printf("Method: SVD, Solution: [");
-        for (int i = 1; i <= n; ++i) {
-            if (i > 1) {
-                printf(", ");
-            }
-            printf("%f", x[i]);
+        /////////////// improved LU decomposition
+
+        copy_matrix(a_bkup, a, 1, m, 1, n);
+        copy_matrix(b_bkup, b_mat, 1, m, 1, 1);
+        flatten(b_mat, b, 1, m);
+        ludcmp(a, m, ivec, &d);
+        lubksb(a, m, ivec, b);
+        report("mprove, LU Decomposition Only", x, n);
+        // Add random noise to b
+        for (int i = 1; i <= m; ++i) {
+            x[i] += ((float)rand() / (float)RAND_MAX) * 0.01;
         }
-        printf("]\n");
+        report("mprove (noisy)", x, n);
+        float **a_mprove = matrix(1, m, 1, n);
+        copy_matrix(a_bkup, a_mprove, 1, m, 1, n);
+        mprove(a_mprove, a, n, ivec, b, x);
+        report("mprove (improved LU)", x, n);
+        free_matrix(a_mprove, 1, m, 1, n);
 
-        free_ivector(indices, 1, n);
+        /////////// Inverse Matrix
+        copy_matrix(a_bkup, a, 1, m, 1, n);
+        ludcmp(a, m, ivec, &d);
+
+        float *col = vector(1, m);
+        float **y = matrix(1, m, 1, n);
+        for (int i = 1; i <= n; ++i) {
+            for (int j = 1; j <= m; ++j) {
+                col[j] = 0;
+            }
+            col[i] = 1;
+            lubksb(a, m, ivec, col);
+            for (int j = 1; j <= m; ++j) {
+                y[j][i] = col[j];
+            }
+        }
+        printf("LU Decomposition, Inverse Matrix:\n");
+        print_mat(y, 1, m, 1, n);
+        free_vector(col, 1, m);
+        free_matrix(y, 1, m, 1, n);
+
+        ///////////// Determinant
+        ludcmp(a, m, ivec, &d);
+        for (int i = 1; i <= n; ++i) {
+            d *= a[i][i];
+        }
+        printf("LU Decomposition, Determinant: %f\n", d);
+
+        ///////////// Clean up bye bye
+        free_ivector(ivec, 1, n);
         free_vector(b, 1, m);
         free_matrix(a, 1, m, 1, n);
         free_matrix(b_mat, 1, m, 1, 1);

@@ -1,6 +1,7 @@
 {
   "cSpell.enabled": false,
   "files.associations": {
-    "nr.h": "c"
+    "nr.h": "c",
+    "stddef.h": "c"
   }
 }
