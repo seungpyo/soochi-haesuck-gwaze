@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -g -I ../NRs/ansi/other
+CFLAGS = -g -I ../NRs/ansi/other 
 SRCS = main.c \
 	../NRS/ansi/recipes/gaussj.c \
 	../NRS/ansi/recipes/ludcmp.c \
@@ -7,7 +7,8 @@ SRCS = main.c \
 	../NRs/ansi/recipes/mprove.c \
 	../NRs/ansi/recipes/nrutil.c \
 	../NRs/ansi/recipes/lubksb.c \
-	../NRs/ansi/recipes/pythag.c
+	../NRs/ansi/recipes/pythag.c \
+	../NRs/ansi/recipes/svbksb.c
 OBJS = $(SRCS:.c=.o)
 TARGET = runHw03
 
