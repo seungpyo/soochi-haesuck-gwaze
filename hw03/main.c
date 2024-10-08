@@ -29,7 +29,7 @@ int main()
     int n, m;
     fscanf(fp, "%d %d", &n, &m);
     float **a = matrix(1, n, 1, n);
-    float **b = cvector(1, n);
+    float *b = vector(1, n);
     for (int i = 1; i <= n; ++i)
     {
       for (int j = 1; j <= n; ++j)
@@ -39,7 +39,7 @@ int main()
     }
     for (int i = 1; i <= n; ++i)
     {
-      fscanf(fp, "%f", &b[i][1]);
+      fscanf(fp, "%f", &b[i]);
     }
     fclose(fp);
 
