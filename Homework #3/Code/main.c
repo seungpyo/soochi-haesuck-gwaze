@@ -5,6 +5,8 @@
 #include "nr.h"
 #include "nrutil.h"
 
+// #define SKIP_GAUSSJ
+
 void print_mat(float **m, int row_start, int row_end, int col_start, int col_end) {
     for (int i = row_start; i <= row_end; ++i) {
         for (int j = col_start; j <= col_end; ++j) {
@@ -186,10 +188,12 @@ int main(int argc, char *argv[]) {
     }
     fclose(fp);
 
-    // Gauss-Jordan
+// Gauss-Jordan
+#ifndef SKIP_GAUSSJ
     copy_matrix(a_bkup, a, 1, m, 1, n);
     copy_matrix(b_bkup, b, 1, m, 1, 1);
     gauss_jordan(a, b, n);
+#endif  // SKIP_GAUSSJ
 
     // LU Decomposition
     copy_matrix(a_bkup, a, 1, m, 1, n);
