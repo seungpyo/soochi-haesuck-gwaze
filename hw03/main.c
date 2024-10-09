@@ -58,7 +58,7 @@ void lu_decomposition(float **a, float **b, int n) {
     ludcmp(a, n, ivec, &d);
     lubksb(a, n, ivec, bvec);
     report("LU Decomposition", bvec, n);
-    free_vector(ivec, 1, n);
+    free_ivector(ivec, 1, n);
 }
 
 void svd(float **a, float **b, int n) {
@@ -82,7 +82,7 @@ void svd(float **a, float **b, int n) {
         }
     }
 
-    svbksb(a, w, v, n, n, b, x);
+    svbksb(a, w, v, n, n, bvec, x);
     report("SVD", x, n);
 
     free_vector(w, 1, n);
